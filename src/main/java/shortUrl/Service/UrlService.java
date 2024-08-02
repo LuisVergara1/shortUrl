@@ -26,7 +26,13 @@ public class UrlService {
      @Value("${BLOCKED_DOMAINS}")
     private String blockedDomainsEnv;
 
+    @Value("${PROTECTED_URLS}")
+    private String protectedUrlsEnv;
+
     private Set<String> blockedDomains = new HashSet<>();
+    private Set<String> protectedUrls = new HashSet<>();
+
+    
 
     @PostConstruct
     private void init() {
@@ -36,8 +42,15 @@ public class UrlService {
                 blockedDomains.add(domain.trim());
             }
         }
+          // Inicializar URLs protegidas
+        if (protectedUrlsEnv != null && !protectedUrlsEnv.isEmpty()) {
+            String[] urls = protectedUrlsEnv.split(",");
+            for (String url : urls) {
+                protectedUrls.add(url.trim());
+            }
+        }
     }
-
+    
 
     public boolean isBlockedUrl(String url) {
       System.out.println("Verificando URL: " + url);
@@ -52,6 +65,9 @@ public class UrlService {
       return false;
   }
 
+  public boolean isProtectedUrl(String shortUrl) {
+    return protectedUrls.contains(shortUrl);
+}
 
     //Crea la URL segun la Original 
     public String createUrl(RequestUrl url)
@@ -68,14 +84,14 @@ public class UrlService {
         return urlShort;
       }
     }
+  
 
     //Genera la URL Ocupando un UUID y tomando los primeros 6 Digitos
     private String generateUrl(String url) {
 
       UUID uuid = UUID.randomUUID();
       return uuid.toString().substring(0,6);
-
-  }
+    }
 
 
   public String fullUrl(FullUrl fullUrl) {
@@ -88,7 +104,7 @@ public class UrlService {
       }else{
         // Crear una nueva URL
         Url newUrl = new Url();
-        newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
+        newUrl.setLocalDateTime(LocalDateTime.now().plusYears(4));
         newUrl.setShortUrl(fullUrl.getShortUrl());
         newUrl.setUrlOriginal(fullUrl.getUrlOriginal());
         
@@ -127,7 +143,7 @@ public class UrlService {
   {
     Url url = urlRepository.findByShortUrl(shortUrl);
 
-    if (url != null) {
+    if (url != null && !isProtectedUrl(shortUrl)) {
       url.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
       urlRepository.save(url);
       return true;
@@ -138,7 +154,7 @@ public class UrlService {
   public Boolean deleteUrl(String shortUrl)
   {
     Url url = urlRepository.findByShortUrl(shortUrl);
-    if (url != null) {
+    if (url != null && !isProtectedUrl(shortUrl)) {
       urlRepository.delete(url);
       return true;
     }
