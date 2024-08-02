@@ -23,7 +23,7 @@ public class UrlService {
     @Value("${domain}")
     private String domain = "http://localhost:8080/redirect/"; 
 
-     @Value("${BLOCKED_DOMAINS}")
+    @Value("${BLOCKED_DOMAINS}")
     private String blockedDomainsEnv;
 
     @Value("${PROTECTED_URLS}")
@@ -104,7 +104,7 @@ public class UrlService {
       }else{
         // Crear una nueva URL
         Url newUrl = new Url();
-        newUrl.setLocalDateTime(LocalDateTime.now().plusYears(4));
+        newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
         newUrl.setShortUrl(fullUrl.getShortUrl());
         newUrl.setUrlOriginal(fullUrl.getUrlOriginal());
         

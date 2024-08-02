@@ -18,7 +18,7 @@ import shortUrl.Entity.Url;
 import shortUrl.Service.UrlService;
 
 @RestController
-@RequestMapping("/r/")
+@RequestMapping("/r")
 public class RedirectController {
 
 
