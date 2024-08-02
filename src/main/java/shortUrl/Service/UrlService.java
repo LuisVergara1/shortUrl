@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
+import jakarta.annotation.PostConstruct;
 import shortUrl.DTO.FullUrl;
 import shortUrl.DTO.RequestUrl;
 import shortUrl.Entity.Url;
 import shortUrl.Repository.UrlRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
+import java.net.URISyntaxException;
 
 @Service
 public class UrlService {
@@ -21,16 +24,50 @@ public class UrlService {
     @Value("${domain}")
     private String domain = "http://localhost:8080/redirect/"; 
 
+     @Value("${BLOCKED_DOMAINS}")
+    private String blockedDomainsEnv;
+
+    private Set<String> blockedDomains = new HashSet<>();
+
+    @PostConstruct
+    private void init() {
+        if (blockedDomainsEnv != null && !blockedDomainsEnv.isEmpty()) {
+            String[] domains = blockedDomainsEnv.split(",");
+            for (String domain : domains) {
+                blockedDomains.add(domain.trim());
+            }
+        }
+    }
+
+
+    public boolean isBlockedUrl(String url) {
+      System.out.println("Verificando URL: " + url);
+      for (String blockedDomain : blockedDomains) {
+          System.out.println("Comparando con dominio bloqueado: " + blockedDomain);
+          if (url.contains(blockedDomain)) {
+              System.out.println("URL bloqueada: " + url);
+              return true;
+          }
+      }
+      System.out.println("URL permitida: " + url);
+      return false;
+  }
+
+
     //Crea la URL segun la Original 
     public String createUrl(RequestUrl url)
     {
+      if (isBlockedUrl(url.getUrlOriginal())) {
+        return null;
+    }else{
         Url newUrl = new Url();
         newUrl.setUrlOriginal(url.getUrlOriginal());
-        newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(1));
+        newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
         newUrl.setShortUrl(generateUrl(url.getUrlOriginal().toString()));
         String urlShort = domain + newUrl.getShortUrl(); 
         urlRepository.save(newUrl);
         return urlShort;
+      }
     }
 
     //Genera la URL Ocupando un UUID y tomando los primeros 6 Digitos
@@ -47,6 +84,9 @@ public class UrlService {
     boolean exists = urlRepository.existsByShortUrl(fullUrl.getShortUrl());
     
     if (!exists) {
+      if (isBlockedUrl(fullUrl.getUrlOriginal())) {
+        return null;
+      }else{
         // Crear una nueva URL
         Url newUrl = new Url();
         newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
@@ -58,6 +98,7 @@ public class UrlService {
         
         // Construir y devolver la URL corta completa
         return domain + newUrl.getShortUrl();
+      }
     } else {
         // Devolver un mensaje si la URL corta ya existe
         return "No se pudo crear la URL porque ya existe.";
