@@ -9,6 +9,9 @@ import shortUrl.DTO.FullUrl;
 import shortUrl.DTO.RequestUrl;
 import shortUrl.Entity.Url;
 import shortUrl.Repository.UrlRepository;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.HashSet;
@@ -73,16 +76,18 @@ public class UrlService {
     public String createUrl(RequestUrl url)
     {
       if (isBlockedUrl(url.getUrlOriginal())) {
-        return null;
-    }else{
+        return "La URL se Encuentra Bloqueada";
+    }
+    if (isValidUrl(url.getUrlOriginal())) {
+      return "Debes Ingresar una URL Valida";
+    }
         Url newUrl = new Url();
         newUrl.setUrlOriginal(url.getUrlOriginal());
         newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
         newUrl.setShortUrl(generateUrl(url.getUrlOriginal().toString()));
         String urlShort = domain + newUrl.getShortUrl(); 
         urlRepository.save(newUrl);
-        return urlShort;
-      }
+        return urlShort;   
     }
   
 
@@ -92,6 +97,16 @@ public class UrlService {
       UUID uuid = UUID.randomUUID();
       return uuid.toString().substring(0,6);
     }
+    
+    //Valida si es una URL Valida 
+    public boolean isValidUrl(String url) {
+      try {
+          new URI(url).parseServerAuthority();
+          return true;
+      } catch (URISyntaxException e) {
+          return false;
+      }
+  }
 
 
   public String fullUrl(FullUrl fullUrl) {
@@ -100,8 +115,11 @@ public class UrlService {
     
     if (!exists) {
       if (isBlockedUrl(fullUrl.getUrlOriginal())) {
-        return null;
-      }else{
+        return "La URL se encuentra Bloqueada";
+      }
+      if (isValidUrl(fullUrl.getUrlOriginal())) {
+        return "Debes Ingresar una URL Valida";
+      }
         // Crear una nueva URL
         Url newUrl = new Url();
         newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
@@ -112,11 +130,10 @@ public class UrlService {
         urlRepository.save(newUrl);
         
         // Construir y devolver la URL corta completa
-        return domain + newUrl.getShortUrl();
-      }
+        return domain + newUrl.getShortUrl(); 
     } else {
         // Devolver un mensaje si la URL corta ya existe
-        return "No se pudo crear la URL porque ya existe.";
+        return "La URL Personalizada ya se encuentra en uso ";
     }
 }
 

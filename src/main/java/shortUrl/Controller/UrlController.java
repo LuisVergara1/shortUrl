@@ -69,14 +69,13 @@ public class UrlController {
     public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
         // Llamar al servicio para crear la URL corta
         String shortUrl = urlService.fullUrl(fullUrl);
-        
         // Si se devuelve un mensaje de error, responder con un error HTTP
-        if (shortUrl.contains("No se pudo crear")) {
-            return ResponseEntity.status(400).body(shortUrl); // Código 400 Bad Request
-        }
-        
-        // Si se genera correctamente, devolver la URL corta con código 200 OK
-        return ResponseEntity.ok(shortUrl);
+        if (shortUrl != null ) {
+             // Si se genera correctamente, devolver la URL corta con código 200 OK
+            return ResponseEntity.ok(shortUrl);
+        }else{
+            return ResponseEntity.status(400).body("No Se Pudo Crear la URL"); // Código 400 Bad Request
+        }    
     }
 
 
