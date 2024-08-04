@@ -24,7 +24,7 @@ public class UrlService {
     private UrlRepository urlRepository;
 
     @Value("${domain}")
-    private String domain = "http://localhost:8080/redirect/"; 
+    private String domain = "http://localhost:8080/r/"; 
 
     @Value("${BLOCKED_DOMAINS}")
     private String blockedDomainsEnv;
