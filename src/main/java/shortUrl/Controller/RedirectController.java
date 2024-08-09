@@ -47,4 +47,5 @@ public class RedirectController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Url No Encontrada.");
         }
     }
+ 
 }

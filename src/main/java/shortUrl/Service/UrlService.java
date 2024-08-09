@@ -78,7 +78,7 @@ public class UrlService {
       if (isBlockedUrl(url.getUrlOriginal())) {
         return "La URL se Encuentra Bloqueada";
     }
-    if (isValidUrl(url.getUrlOriginal())) {
+    if (!isValidUrl(url.getUrlOriginal())) {
       return "Debes Ingresar una URL Valida";
     }
         Url newUrl = new Url();
@@ -117,7 +117,7 @@ public class UrlService {
       if (isBlockedUrl(fullUrl.getUrlOriginal())) {
         return "La URL se encuentra Bloqueada";
       }
-      if (isValidUrl(fullUrl.getUrlOriginal())) {
+      if (!isValidUrl(fullUrl.getUrlOriginal())) {
         return "Debes Ingresar una URL Valida";
       }
         // Crear una nueva URL
