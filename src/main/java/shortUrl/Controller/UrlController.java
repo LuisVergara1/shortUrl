@@ -49,7 +49,7 @@ public class UrlController {
             return ResponseEntity.ok(url);
         }
         else{
-            return ResponseEntity.status(404).body("No se Pudo Crear la Url");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo crear la URL");
         }
         
     }
@@ -65,18 +65,28 @@ public class UrlController {
     @ApiResponse(responseCode = "200", description = "The short URL was generated successfully.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") }),
     @ApiResponse(responseCode = "400", description = "Invalid input or URL creation failed.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") })
 })
-    @PostMapping("/createfull")
-    public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
-        // Llamar al servicio para crear la URL corta
-        String shortUrl = urlService.fullUrl(fullUrl);
-        // Si se devuelve un mensaje de error, responder con un error HTTP
-        if (shortUrl != null ) {
-             // Si se genera correctamente, devolver la URL corta con código 200 OK
-            return ResponseEntity.ok(shortUrl);
-        }else{
-            return ResponseEntity.status(400).body("No Se Pudo Crear la URL"); // Código 400 Bad Request
-        }    
+@PostMapping("/createfull")
+public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
+    // Verificar si la URL está bloqueada
+    if (urlService.isBlockedUrl(fullUrl.getUrlOriginal())) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este sitio web está bloqueado");
     }
+
+    // Verificar si la URL es válida
+    if (!urlService.isValidUrl(fullUrl.getUrlOriginal())) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La URL no es válida");
+    }
+
+    // Llamar al servicio para crear la URL corta
+    String shortUrl = urlService.fullUrl(fullUrl);
+    if (shortUrl != null) {
+        // Si se genera correctamente, devolver la URL corta con código 200 OK
+        return ResponseEntity.ok(shortUrl);
+    } else {
+        // Si no se pudo crear la URL, devolver un error con código 400 Bad Request
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo crear la URL");
+    }
+}
 
 
 //------------------------------------------------
@@ -90,15 +100,15 @@ public class UrlController {
     @ApiResponse(responseCode = "404", description = "Invalid URL or the URL does not exist.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") })
 })
     @PutMapping("/extend")
-    public ResponseEntity<String>extendTime(@RequestParam String shortUrl)
+    public ResponseEntity<String>extendTime(@RequestBody RequestUrl requestUrl)
     {
-        Boolean result = urlService.extendTime(shortUrl);
+        Boolean result = urlService.extendTime(requestUrl.getUrlOriginal());
 
         if (result) {
             return ResponseEntity.ok("Url actualizada") ;
         }
         else{
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se pudo actualizar la Url o no existe") ;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo Actualizar la URL");
         }
 
     }
@@ -110,17 +120,17 @@ public class UrlController {
 )
 @ApiResponses({
     @ApiResponse(responseCode = "200", description = "The short URL was deleted successfully.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") }),
-    @ApiResponse(responseCode = "404", description = "The short URL does not exist.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") })
+    @ApiResponse(responseCode = "400", description = "The short URL does not exist.", content = { @Content(schema = @Schema(implementation = String.class), mediaType = "application/json") })
 })
     @DeleteMapping("/delete")
-    public ResponseEntity<String>deleteUrl(@RequestParam String shortUrl)
+    public ResponseEntity<String>deleteUrl(@RequestBody RequestUrl requestUrl)
     {
-        Boolean result = urlService.deleteUrl(shortUrl);
+        Boolean result = urlService.deleteUrl(requestUrl.getUrlOriginal());
         if (result) {
             return ResponseEntity.ok("Url Eliminada");
         }else
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Url no Encontrada");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo eliminar la URL");
         }
     }
 }

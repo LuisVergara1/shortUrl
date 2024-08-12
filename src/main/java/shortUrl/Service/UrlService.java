@@ -10,8 +10,8 @@ import shortUrl.DTO.RequestUrl;
 import shortUrl.Entity.Url;
 import shortUrl.Repository.UrlRepository;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.HashSet;
@@ -76,10 +76,10 @@ public class UrlService {
     public String createUrl(RequestUrl url)
     {
       if (isBlockedUrl(url.getUrlOriginal())) {
-        return "La URL se Encuentra Bloqueada";
+        return null;
     }
     if (!isValidUrl(url.getUrlOriginal())) {
-      return "Debes Ingresar una URL Valida";
+      return null;
     }
         Url newUrl = new Url();
         newUrl.setUrlOriginal(url.getUrlOriginal());
@@ -90,7 +90,6 @@ public class UrlService {
         return urlShort;   
     }
   
-
     //Genera la URL Ocupando un UUID y tomando los primeros 6 Digitos
     private String generateUrl(String url) {
 
@@ -101,9 +100,9 @@ public class UrlService {
     //Valida si es una URL Valida 
     public boolean isValidUrl(String url) {
       try {
-          new URI(url).parseServerAuthority();
+          new URL(url);
           return true;
-      } catch (URISyntaxException e) {
+      } catch (MalformedURLException e) {
           return false;
       }
   }
@@ -114,12 +113,6 @@ public class UrlService {
     boolean exists = urlRepository.existsByShortUrl(fullUrl.getShortUrl());
     
     if (!exists) {
-      if (isBlockedUrl(fullUrl.getUrlOriginal())) {
-        return "La URL se encuentra Bloqueada";
-      }
-      if (!isValidUrl(fullUrl.getUrlOriginal())) {
-        return "Debes Ingresar una URL Valida";
-      }
         // Crear una nueva URL
         Url newUrl = new Url();
         newUrl.setLocalDateTime(LocalDateTime.now().plusMinutes(15));
