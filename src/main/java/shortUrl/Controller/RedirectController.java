@@ -3,6 +3,7 @@ package shortUrl.Controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,10 @@ public class RedirectController {
     UrlService urlService ;
     //-----------------------------------------------
 
+    @Value("${DOMAIN_ERROR}")
+    private String domainError;
+
+
     //EndPoint Redirect URL
     @Operation(
       summary = "Redirect to original URL",
@@ -44,7 +49,7 @@ public class RedirectController {
             response.sendRedirect(url.getUrlOriginal());
         }else
         {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Url No Encontrada.");
+            response.sendRedirect(domainError);;
         }
     }
  

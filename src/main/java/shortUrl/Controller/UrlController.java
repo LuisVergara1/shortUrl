@@ -77,6 +77,11 @@ public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La URL no es válida");
     }
 
+    if (!fullUrl.getShortUrl().matches("^[a-zA-Z0-9]+$")) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La URL solo puede contener letras y números");
+    }
+
+
     // Llamar al servicio para crear la URL corta
     String shortUrl = urlService.fullUrl(fullUrl);
     if (shortUrl != null) {
