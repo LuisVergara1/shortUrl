@@ -79,9 +79,10 @@ public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
 
     if (!fullUrl.getShortUrl().matches("^[a-zA-Z0-9]+$")) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La URL solo puede contener letras y números");
+    }   Boolean exists = urlService.exists(fullUrl.getShortUrl());
+    if (exists) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La URL Personalizada ya existe");
     }
-
-
     // Llamar al servicio para crear la URL corta
     String shortUrl = urlService.fullUrl(fullUrl);
     if (shortUrl != null) {
@@ -91,6 +92,7 @@ public ResponseEntity<String> createUrl(@RequestBody FullUrl fullUrl) {
         // Si no se pudo crear la URL, devolver un error con código 400 Bad Request
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo crear la URL");
     }
+     
 }
 
 

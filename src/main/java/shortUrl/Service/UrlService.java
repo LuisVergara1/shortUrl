@@ -126,7 +126,7 @@ public class UrlService {
         return domain + newUrl.getShortUrl(); 
     } else {
         // Devolver un mensaje si la URL corta ya existe
-        return "La URL Personalizada ya se encuentra en uso ";
+        return null;
     }
 }
 
@@ -171,4 +171,8 @@ public class UrlService {
     return false;
   }
 
+  public Boolean exists(String shortUrl) {
+    return urlRepository.existsByShortUrl(shortUrl);
+
+}
 }
