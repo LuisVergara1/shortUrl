@@ -11,4 +11,6 @@ public class FullUrl {
 
     private String urlOriginal;
     private String shortUrl;
+    private String alias;
+    private String managementKey;
 }

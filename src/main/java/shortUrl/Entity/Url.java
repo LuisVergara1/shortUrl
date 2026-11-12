@@ -28,4 +28,13 @@ public class Url {
     @Column(name = "LocalDateTime")
     private LocalDateTime localDateTime;
 
+    @Column(name = "click_count", nullable = false, insertable = false, updatable = false)
+    private long clickCount;
+
+    @Column(name = "list_id")
+    private Long listId;
+
+    @Column(name = "management_key_hash")
+    private String managementKeyHash;
+
 }

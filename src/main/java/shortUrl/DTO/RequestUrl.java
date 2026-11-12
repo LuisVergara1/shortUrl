@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class RequestUrl 
 {    
     private String UrlOriginal;
+    private String alias;
+    private String managementKey;
 }

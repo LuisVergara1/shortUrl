@@ -22,6 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET","POST","PUT","DELETE")
                 .allowedHeaders("*")
+                .exposedHeaders("X-Management-Key", "Retry-After")
                 .allowCredentials(true);
     }
 }
