@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RequestUrl 
 {    
-    private String UrlOriginal;
+    private String urlOriginal;
     private String alias;
     private String managementKey;
 }
